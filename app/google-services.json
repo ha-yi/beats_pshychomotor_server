@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "529935940403",
+    "firebase_url": "https://beatsserver-b83e0.firebaseio.com",
+    "project_id": "beatsserver-b83e0",
+    "storage_bucket": "beatsserver-b83e0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:529935940403:android:f2c5fda0ac694256f55c46",
+        "android_client_info": {
+          "package_name": "com.linov.beats_server"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "529935940403-0q2esn0bng1lmemmbdofrfqf299vi1mh.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.linov.beats_server",
+            "certificate_hash": "c3159ec23407b3474d28f6c0e4fd481d4fa79338"
+          }
+        },
+        {
+          "client_id": "529935940403-64vdf5k05taidsoekdllov8ehku7hp1m.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCzukK7OwQWz3EWx-40yRX0U-TU-NZjH78"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "529935940403-64vdf5k05taidsoekdllov8ehku7hp1m.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -5,24 +5,36 @@ import android.os.Bundle
 import android.util.Log.e
 import androidmads.library.qrgenearator.QRGContents
 import androidmads.library.qrgenearator.QRGEncoder
+import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.gson.Gson
+import com.linov.beats_server.models.FirebaseHelper
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.dialog_input.view.*
 import java.net.NetworkInterface
 import java.util.*
+import android.app.ActivityManager
+import android.content.Context
+import android.view.*
+
 
 class MainActivity : AppCompatActivity() {
     private val defaultIPAddr = "192.168.43.1"
 
     private val server by lazy {
         GameServer {
-            renderIPAddress()
+            runOnUiThread {
+                renderIPAddress()
+            }
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        requestWindowFeature(Window.FEATURE_NO_TITLE)
         super.onCreate(savedInstanceState)
+        window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,   WindowManager.LayoutParams.FLAG_FULLSCREEN)
+        window.setType(WindowManager.LayoutParams.TYPE_KEYGUARD_DIALOG)
         setContentView(R.layout.activity_main)
-        server.start()
 
         recycler.layoutManager = LinearLayoutManager(this)
         val adapter = SimpleAdapter()
@@ -30,7 +42,65 @@ class MainActivity : AppCompatActivity() {
 
         server.clients.observe(this, androidx.lifecycle.Observer {
             adapter.updateItems(it)
+            txtTerhubung.text = "${it.size} Client Terhubung"
+            if (it.map { it.groupReady }.all { it }) {
+                btnStartGroupTest.visibility = View.VISIBLE
+            } else {
+                btnStartGroupTest.visibility = View.GONE
+            }
+            if (it.map { it.onGroupBoard }.all { it }) {
+                btnStartNextTask.visibility = View.VISIBLE
+                btnStartGroupTest.visibility = View.GONE
+                txtGroupGameStatus.visibility = View.VISIBLE
+            } else {
+                btnStartNextTask.visibility = View.GONE
+                txtGroupGameStatus.visibility = View.GONE
+            }
         })
+
+        btnStartGroupTest.setOnClickListener {
+            AlertDialog.Builder(this)
+                .setTitle("Memulai Group Test")
+                .setMessage("Pastikan semua peserta yang terhubung dalam session ini sudah siap untuk mengikuti group test.")
+                .setPositiveButton("Mulai") { di, _ ->
+                    server.broadcast(Gson().toJson(GameCommand(START_GROUP_GAME, "start")))
+                    di.dismiss()
+                }.setNegativeButton("Batal") { di, _ ->
+                    di.dismiss()
+                }.show()
+        }
+
+        btnStartNextTask.setOnClickListener {
+            AlertDialog.Builder(this)
+                .setTitle("Jalankan Task Berikutnya")
+                .setMessage("Pastikan semua peserta Sudah siap untuk mengerjakan task berikutnya.")
+                .setPositiveButton("Mulai") { di, _ ->
+                    server.broadcast(Gson().toJson(GameCommand(START_GROUP_TASK, "start")))
+                    di.dismiss()
+                }.setNegativeButton("Batal") { di, _ ->
+                    di.dismiss()
+                }.show()
+        }
+
+        val view = LayoutInflater.from(this).inflate(R.layout.dialog_input, null, false)
+
+        val alert = AlertDialog.Builder(this)
+            .setTitle("Masukkan ID Group")
+            .setView(view)
+            .setCancelable(false)
+            .create()
+
+        view.btnSimpan.setOnClickListener {
+            if(view.inputIDGroup.text.toString().length < 4) {
+                    view.inputIDGroup.error = "ID Group tidak boleh kurang dari 4"
+                return@setOnClickListener
+            }
+            FirebaseHelper.serverID = view.inputIDGroup.text.toString()
+            FirebaseHelper.testLoc = view.inputIDLokasi.text.toString()
+            server.start()
+            alert.dismiss()
+        }
+        alert.show()
     }
 
     private fun renderIPAddress() {
@@ -53,6 +123,7 @@ class MainActivity : AppCompatActivity() {
             val generator = QRGEncoder(it, null, QRGContents.Type.TEXT, 500)
             val bitmap = generator.encodeAsBitmap()
             imgBarcode.setImageBitmap(bitmap)
+            FirebaseHelper.initializeServerData(it)
         }
     }
 
@@ -75,5 +146,32 @@ class MainActivity : AppCompatActivity() {
             e("ERROR", er.toString())
         }
         return listOf()
+    }
+
+    override fun onBackPressed() {
+        AlertDialog.Builder(this)
+            .setTitle("Tutup?")
+            .setMessage("Menutup aplikasi ini akan menjadikan server mati dan tidak dapat melakukan sinkronisasi data dengan client yang sudah terhubung. Yakin tutup??")
+            .setPositiveButton("batal") { di, _ ->
+                di.dismiss()
+            }.setNegativeButton("tutup") { di, _ ->
+                super.onBackPressed()
+                di.dismiss()
+            }.show()
+    }
+
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+    }
+
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        return false
+    }
+
+    override fun onPause() {
+        super.onPause()
+        val activityManager = applicationContext
+            .getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        activityManager.moveTaskToFront(taskId, 0)
     }
 }

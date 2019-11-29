@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-
     <TextView
         android:textSize="20sp"
         android:layout_marginTop="20dp"
@@ -64,6 +63,8 @@
         android:layout_height="match_parent">
 
         <TextView
+            android:textStyle="bold"
+            android:id="@+id/txtTerhubung"
             android:layout_marginTop="30dp"
             android:layout_marginBottom="15dp"
             android:text="Device terhubung"
@@ -76,9 +77,51 @@
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler"
+            android:layout_weight="1"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
+        <TextView
+            android:text="Group Test Controller"
+            android:gravity="center"
+            android:paddingTop="25dp"
+            android:paddingStart="5dp"
+            android:paddingEnd="5dp"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <Button
+            android:visibility="gone"
+            android:text="START GROUP TEST"
+            android:textColor="#FFF"
+            android:background="#AED581"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:id="@+id/btnStartGroupTest"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"/>
+
+        <TextView
+            android:visibility="gone"
+            android:id="@+id/txtGroupGameStatus"
+            android:layout_margin="10dp"
+            android:text="Group test sedang berjalan..."
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <Button
+            android:visibility="gone"
+            android:layout_marginTop="5dp"
+            android:text="Task Berikutnya >"
+            android:textColor="#FFF"
+            android:background="#4DD0E1"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:id="@+id/btnStartNextTask"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"/>
     </LinearLayout>
 
 

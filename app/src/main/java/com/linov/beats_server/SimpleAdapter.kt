@@ -1,9 +1,14 @@
 package com.linov.beats_server
 
+import android.graphics.Color
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.view.setPadding
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.android.synthetic.main.recycler_item.view.*
 
 /**
  * Created by Hayi Nukman at 2019-11-27
@@ -11,14 +16,16 @@ import androidx.recyclerview.widget.RecyclerView
  */
 
 class SimpleAdapter: RecyclerView.Adapter<SimpleAdapter.SimpleVH>() {
-    private var listItem: List<String> = listOf()
+    private var listItem: List<Clients> = listOf()
 
-    fun updateItems(newData: List<String>) {
+    fun updateItems(newData: List<Clients>) {
         listItem = newData
         notifyDataSetChanged()
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SimpleVH = SimpleVH(TextView(parent.context))
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SimpleVH = SimpleVH(
+        LayoutInflater.from(parent.context).inflate(R.layout.recycler_item, parent, false)
+    )
 
     override fun getItemCount(): Int = listItem.size
 
@@ -27,8 +34,16 @@ class SimpleAdapter: RecyclerView.Adapter<SimpleAdapter.SimpleVH>() {
     }
 
     class SimpleVH(view: View): RecyclerView.ViewHolder(view) {
-        fun setData(data: String) {
-            (itemView as TextView).text = data
+        fun setData(data: Clients) {
+            val text = "${if (data.groupReady) "[G]" else ""} ${data.name} (${data.ip})"
+            itemView.apply {
+                txtContent.text = text
+            }
+            if (data.groupReady) {
+                itemView.setBackgroundColor(Color.CYAN)
+            } else {
+                itemView.setBackgroundColor(Color.TRANSPARENT)
+            }
         }
     }
 }
