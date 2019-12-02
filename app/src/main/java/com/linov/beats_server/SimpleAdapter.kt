@@ -35,14 +35,19 @@ class SimpleAdapter: RecyclerView.Adapter<SimpleAdapter.SimpleVH>() {
 
     class SimpleVH(view: View): RecyclerView.ViewHolder(view) {
         fun setData(data: Clients) {
-            val text = "${if (data.groupReady) "[G]" else ""} ${data.name} (${data.ip})"
-            itemView.apply {
-                txtContent.text = text
-            }
+            var text = "${if (data.groupReady) "[G]" else ""} ${data.name} (${data.ip})"
+
+            itemView.setBackgroundColor(Color.TRANSPARENT)
             if (data.groupReady) {
                 itemView.setBackgroundColor(Color.CYAN)
-            } else {
-                itemView.setBackgroundColor(Color.TRANSPARENT)
+            }
+
+            if (data.onGroupBoard) {
+                text = "[G] ${data.name} (${data.ip}) running test"
+            }
+
+            itemView.apply {
+                txtContent.text = text
             }
         }
     }

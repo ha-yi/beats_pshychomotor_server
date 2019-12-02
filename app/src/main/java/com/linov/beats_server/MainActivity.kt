@@ -15,17 +15,31 @@ import java.net.NetworkInterface
 import java.util.*
 import android.app.ActivityManager
 import android.content.Context
+import android.os.CountDownTimer
 import android.view.*
 
 
 class MainActivity : AppCompatActivity() {
     private val defaultIPAddr = "192.168.43.1"
+    var groupTaskCounter = 0
 
     private val server by lazy {
         GameServer {
             runOnUiThread {
                 renderIPAddress()
             }
+        }
+    }
+
+    val timer = object : CountDownTimer(120000, 1000) {
+        override fun onFinish() {
+            server.sendTimeut()
+        }
+
+        override fun onTick(m: Long) {
+            val minutes = m / 1000 / 60
+            val seconds = m / 1000 % 60
+            txtGroupGameStatus.text = "Sisa waktu pengerjaan:\n $minutes menit $seconds detik."
         }
     }
 
@@ -43,6 +57,12 @@ class MainActivity : AppCompatActivity() {
         server.clients.observe(this, androidx.lifecycle.Observer {
             adapter.updateItems(it)
             txtTerhubung.text = "${it.size} Client Terhubung"
+            if (it.isEmpty()) {
+                btnStartGroupTest.visibility = View.GONE
+                btnStartNextTask.visibility = View.GONE
+                txtGroupGameStatus.visibility = View.GONE
+                return@Observer
+            }
             if (it.map { it.groupReady }.all { it }) {
                 btnStartGroupTest.visibility = View.VISIBLE
             } else {
@@ -63,7 +83,9 @@ class MainActivity : AppCompatActivity() {
                 .setTitle("Memulai Group Test")
                 .setMessage("Pastikan semua peserta yang terhubung dalam session ini sudah siap untuk mengikuti group test.")
                 .setPositiveButton("Mulai") { di, _ ->
+                    groupTaskCounter = 0
                     server.broadcast(Gson().toJson(GameCommand(START_GROUP_GAME, "start")))
+                    txtGroupGameStatus.text = "Siap untuk task baru."
                     di.dismiss()
                 }.setNegativeButton("Batal") { di, _ ->
                     di.dismiss()
@@ -75,7 +97,9 @@ class MainActivity : AppCompatActivity() {
                 .setTitle("Jalankan Task Berikutnya")
                 .setMessage("Pastikan semua peserta Sudah siap untuk mengerjakan task berikutnya.")
                 .setPositiveButton("Mulai") { di, _ ->
-                    server.broadcast(Gson().toJson(GameCommand(START_GROUP_TASK, "start")))
+                    groupTaskCounter += 1
+                    server.startNextTask(groupTaskCounter)
+                    startCountDown()
                     di.dismiss()
                 }.setNegativeButton("Batal") { di, _ ->
                     di.dismiss()
@@ -101,6 +125,11 @@ class MainActivity : AppCompatActivity() {
             alert.dismiss()
         }
         alert.show()
+    }
+
+    private fun startCountDown() {
+        timer.cancel()
+        timer.start()
     }
 
     private fun renderIPAddress() {
