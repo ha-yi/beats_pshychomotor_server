@@ -124,5 +124,14 @@
             android:layout_height="50dp"/>
     </LinearLayout>
 
+    <ImageView
+        android:padding="5dp"
+        android:src="@drawable/ic_power_off"
+        android:id="@+id/btnShutdown"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_margin="50dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

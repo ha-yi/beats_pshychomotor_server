@@ -36,11 +36,16 @@ class SimpleAdapter: RecyclerView.Adapter<SimpleAdapter.SimpleVH>() {
     class SimpleVH(view: View): RecyclerView.ViewHolder(view) {
         fun setData(data: Clients) {
             var text = "${if (data.groupReady) "[G]" else ""} ${data.name} (${data.ip})"
+            if (data.connected) {
+                itemView.setBackgroundColor(Color.TRANSPARENT)
+            } else {
+                itemView.setBackgroundColor(Color.LTGRAY)
+            }
 
-            itemView.setBackgroundColor(Color.TRANSPARENT)
             if (data.groupReady) {
                 itemView.setBackgroundColor(Color.CYAN)
             }
+
 
             if (data.onGroupBoard) {
                 text = "[G] ${data.name} (${data.ip}) running test"

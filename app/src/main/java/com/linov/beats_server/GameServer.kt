@@ -44,12 +44,18 @@ class GameServer(
         conn?.send("connected")
         e("SOCKET", "Client connected ${conn?.remoteSocketAddress?.address?.hostAddress}")
         conn?.remoteSocketAddress?.address?.hostAddress?.let {
-            mapClient[it] = Clients(
-                it,
-                "unknown",
-                false,
-                false
-            )
+            if (mapClient.containsKey(it)) {
+                mapClient[it]?.connected = true
+            } else {
+                mapClient[it] = Clients(
+                    it,
+                    "unknown",
+                    false,
+                    false,
+                    false,
+                    true
+                )
+            }
         }
 
         updateClientLiveData()
@@ -62,7 +68,7 @@ class GameServer(
     override fun onClose(conn: WebSocket?, code: Int, reason: String?, remote: Boolean) {
         e("WS", "closed ${conn?.remoteSocketAddress?.address?.hostAddress} $code $remote")
         conn?.remoteSocketAddress?.address?.hostAddress?.let {
-            mapClient.remove(it)
+            mapClient[it]?.connected = false
         }
         updateClientLiveData()
     }
@@ -119,6 +125,7 @@ class GameServer(
     private fun readyForGroup(from: String?, ready: Boolean) {
         e("SERVER", " readyForGroup $from $ready")
         mapClient[from]?.groupReady = ready
+        mapClient[from]?.onGroupBoard = false
         updateClientLiveData()
     }
 
@@ -166,5 +173,6 @@ data class Clients(
     var name: String?,
     var isPersonal: Boolean,
     var groupReady: Boolean,
-    var onGroupBoard: Boolean = false
+    var onGroupBoard: Boolean = false,
+    var connected: Boolean = true
 )

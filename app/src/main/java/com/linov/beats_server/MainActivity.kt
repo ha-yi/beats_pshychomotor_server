@@ -78,6 +78,18 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
+        btnShutdown.setOnClickListener {
+            AlertDialog.Builder(this)
+                .setTitle("Tutup App")
+                .setMessage("Menutup app akan memutuskan koneksi ke client.")
+                .setPositiveButton("Tutup") { di, _ ->
+                    di.dismiss()
+                    finish()
+                }.setNegativeButton("Batal") { di, _ ->
+                    di.dismiss()
+                }.show()
+        }
+
         btnStartGroupTest.setOnClickListener {
             AlertDialog.Builder(this)
                 .setTitle("Memulai Group Test")
