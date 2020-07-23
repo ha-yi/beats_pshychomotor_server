@@ -17,6 +17,7 @@ import android.app.ActivityManager
 import android.content.Context
 import android.os.CountDownTimer
 import android.view.*
+import com.google.android.material.snackbar.Snackbar
 
 
 class MainActivity : AppCompatActivity() {
@@ -95,7 +96,7 @@ class MainActivity : AppCompatActivity() {
                 .setTitle("Memulai Group Test")
                 .setMessage("Pastikan semua peserta yang terhubung dalam session ini sudah siap untuk mengikuti group test.")
                 .setPositiveButton("Mulai") { di, _ ->
-                    groupTaskCounter = 0
+                    groupTaskCounter = -1
                     server.broadcast(Gson().toJson(GameCommand(START_GROUP_GAME, "start")))
                     txtGroupGameStatus.text = "Siap untuk task baru."
                     di.dismiss()
@@ -109,9 +110,15 @@ class MainActivity : AppCompatActivity() {
                 .setTitle("Jalankan Task Berikutnya")
                 .setMessage("Pastikan semua peserta Sudah siap untuk mengerjakan task berikutnya.")
                 .setPositiveButton("Mulai") { di, _ ->
-                    groupTaskCounter += 1
-                    server.startNextTask(groupTaskCounter)
-                    startCountDown()
+                    if (groupTaskCounter <= 9) {
+                        groupTaskCounter += 1
+                        server.startNextTask(groupTaskCounter)
+                    } else {
+                        Snackbar.make(btnStartNextTask, "Task sudah habis", Snackbar.LENGTH_LONG).show()
+                    }
+                    if (groupTaskCounter < 10) {
+                        startCountDown()
+                    }
                     di.dismiss()
                 }.setNegativeButton("Batal") { di, _ ->
                     di.dismiss()
